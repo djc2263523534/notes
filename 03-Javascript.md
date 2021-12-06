@@ -49,7 +49,14 @@ const str = arr.toLocaleString('')
 console.log(str);    //a,b,c
 ~~~
 
-### 2、增删改查
+### 2、类数组转换
+
+1. Array.prototype.splice.call(arrayLike)
+2. Array.prototype.slice.call(arrayLike , 0)
+3. Array.prototype.cocat.apply([] , arrayLike)
+4. Array.from(arrayLike)
+
+### 3、增删改查
 
 1. push() ：向数组的末尾添加新元素
 2. unshift()：向数组首位添加新元素
@@ -82,7 +89,7 @@ const arr2 =['c','d']
 const arr3 = arr1.concat(arr2) //['a','b','c','d']
 ~~~
 
-### 3、截取元素
+### 4、截取元素
 
 1. slice()：按照条件查找出其中的部分元素  
 2. splice(截取位置，截取位数)
@@ -98,7 +105,7 @@ const arr = ['a','b','c']
 const arr = arr.splice(0,2)  //[a,b]
 ~~~
 
-### 4、索引和位置
+### 5、索引和位置
 
 1. indexOf(value)：检测当前值在数组中第一次出现的位置索引(未查询到返回-1)
 2. lastIndexOf(value)：检测当前值在数组中最后一次出现的位置索引(元素最后一个值的索引)
@@ -126,7 +133,7 @@ const arr = [11, 6, 9, 2]
 console.log(arr.sort((a, b) => a - b));  [2,6,9,11]
 ~~~
 
-### 5、方法
+### 6、方法
 
 1. forEach()：ES5 及以下循环遍历数组每一项
 2. map()：ES6 循环遍历数组每一项  实际效率还比不上forEach
@@ -165,7 +172,7 @@ console.log(arr2);  // true
 1.查找
 const arr = ['1', '2', '3']
 const arr1 = arr.find((value, index, arr) => value == 2)
-console.log(arr1);  // ['2']
+console.log(arr1);  // 2
 
 2.索引
 const arr = ['a', 'b', 'c']
@@ -308,7 +315,7 @@ const newstr = str.concat('def')  //'abcdef'
 
 ### 4、判断
 
-1. includes()				用于检查字符串是否包含指定的字符串或字符
+1. includes()				用于检C:\Users\坟场蹦迪\Desktop\blogs\backend\mock\study.js C:\Users\坟场蹦迪\Desktop\blogs\backend\app.js查字符串是否包含指定的字符串或字符
 2. endsWith()				字符串是否以指定的字符串或字符结束
 3. stratsWith()
 

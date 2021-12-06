@@ -15,13 +15,18 @@
 
 ### 2、判断数据类型
 
-1. typeof                               用来区分除了 Null 类型以外的原始数据类型
-2. instanceOf                      不能用于判断原始数据类型的数据      可以用来判断对象的类型
-3. Object.prototype.toString.call()
-4. 判断是否为 null  =>           ===      Object.prototype.toString.call()
-5. Array.isArray(value)           可以用来判断 value 是否是数组
-6. constructor  => Object            __proto__  =>   String.prot            通过原型链来判断
-7. Array.prototype.isPrototypeOf(obj)   判断是否为数组
+1. typeof                               判断原始数据类型   数组、对象、null都会被判断为object，其他判断都正确
+2. instanceOf                      不能用于判断原始数据类型的数据      **只能正确判断引用数据类型**
+3. Object.prototype.toString.call(2)       ->Number
+4. constructor  => Object            __proto__  =>   String.prot            通过原型链来判断
+5. 判断是否为 null  =>           ===      Object.prototype.toString.call()
+
+> 判断数组 
+
+1. Object.prototype.toString.call(obj).slice(8,-1) == 'Array'
+2. Array.isArray(value)           可以用来判断 value 是否是数组
+3. Array.prototype.isPrototypeOf(obj)   判断是否为数组
+4. arr.__ proto__ Array.prototype      原型链判断
 
 ~~~javascript
 typeof undefined // "undefined" 

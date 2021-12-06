@@ -192,91 +192,18 @@ watch:{
 }
 ~~~
 
-### 6、父传子(值)
-
-~~~vue
-1.父组件
-<children path="home"></children>
-~~~
-
-
-
-~~~vue
-2.子组件
-props:{ 
-	one:String,
-	two:[String,Array],
-	// 自定义验证函数
-    propF: {
-      validator: function (value) {
-        // 这个值必须匹配下列字符串中的一个
-        return ['success', 'warning', 'danger'].indexOf(value) !== -1
-      }
-}
-props["path"]
-props:{
-	prop1:{
-		type: 数据类型，
-		default: 默认值，  (如果是一个对象 则必须是一个方法)
-		required: true (必须传值)
-	}
-}
-~~~
+> 
 
 ### 7、样式冲突
 
 1. scope  组件作用域
 2. /deep/  样式穿透
 
-### 8、自定义事件
-
-1. 子组件发射事件    this.$emit(事件名 , 参数)
-2. 父组件接收
-
-~~~vue
-1.子组件
-<button @click="children">发射事件</button>
-methods:{
-	children(){
-		this.$emit('child',参数)
-	}
-}
-2.父组件
-<children @child="btnClick"></children>
-methods:{
-	btnClick(参数){}
-}
-~~~
-
-### 9、数据共享
-
-![数据共享](C:\Users\坟场蹦迪\Desktop\工具箱\笔记\image\数据共享.png)
-
-~~~vue
-1.兄弟组件数据共享
-import  mitt  from 'mitt'
-const bus = mitt()
-
-export default bus
-bus.emit() bus.on()
-
-2.父孙组件数据共享
-provide(){
-	return {
-		//color:'red'
-		compute(() => this.color)
-	}
-}
-inject:['color']         =>  color.value
-~~~
-
 
 
 ### 10、获取Dom元素
 
-1. 定义  ref="name"
-2. 获取ref 对象      this.$refs['name']     =>  可以使用 子组件内的方法
-3. this.$nextTick(() => {  当数据发生发生变化的时候  在Dom 还没有渲染的时候是那不到 ref 的})       
+1. 
 
 ### 11、动态组件
 
@@ -321,15 +248,24 @@ inject:['color']         =>  color.value
 1.私有自定义指令          v-color="'red'"
 directives:{
 	color:{
-		bind(el,binding){
+		bind(el,binding){   //只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化设置
 			//形参中的el 是绑定了此指令的 原生的DOM 对象
 			1.el.style.color = 'pink'             
 			2.el.style.color = binding.value
 		},
-	 updata(el,binding){
+		inserted(){
+			//被绑定元素插入父节点时调用
+		}        
+	 	updata(el,binding){
+			//所在组件的 VNode 更新时调用，但是可能发生在其子 VNode 更新之前
 			el.style.color= binding.value
+		},
+		componentUpdated(){
+			//指令所在组件的 VNode 及其子 VNode 全部更新后调用
+		},
+		unbind(){}
+	    	//只调用一次，指令与元素解绑时调用
 		}
-	}
 }
 简写方法：
 directives:{
@@ -416,9 +352,112 @@ mixins:[myMixin]
     },
 ~~~
 
+### :star:组件通信
 
+### 1、父传子(值)
 
+~~~vue
+1.父组件
+<children path="home"></children>
+~~~
 
+~~~vue
+2.子组件
+props:{ 
+	one:String,
+	two:[String,Array],
+	// 自定义验证函数
+    propF: {
+      validator: function (value) {
+        // 这个值必须匹配下列字符串中的一个
+        return ['success', 'warning', 'danger'].indexOf(value) !== -1
+      }
+}
+props:["path"],  //不指定类型
+props:{
+	prop1:{
+		type: 数据类型，
+		default: 默认值，  (如果是一个对象 则必须是一个方法)
+		required: true (必须传值)
+	}
+}
+~~~
+
+~~~javascript
+//$attrs $listeners   v-bind="$attrs"      v-on="$listeners"
+~~~
+
+> $attrs  包含了父作用域中不作为 prop 被识别 (且获取) 的 attribute 绑定 (`class` 和 `style` 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (`class` 和 `style` 除外)，并且可以通过 `v-bind="$attrs"` 传入内部组件——在创建高级别的组件时非常有用
+
+### 2、自定义事件
+
+1. 子组件发射事件    this.$emit(事件名 , 参数)
+2. 父组件接收
+
+~~~vue
+1.子组件
+<button @click="children">发射事件</button>
+methods:{
+	children(){
+		this.$emit('child',参数)
+	}
+}
+2.父组件
+<children @child="btnClick"></children>
+methods:{
+	btnClick(参数){}
+}
+~~~
+
+### 3、数据共享
+
+![数据共享](C:\Users\坟场蹦迪\Desktop\工具箱\笔记\image\数据共享.png)
+
+~~~vue
+1.兄弟组件数据共享
+import  mitt  from 'mitt'
+const bus = mitt()
+
+export default bus
+bus.emit() bus.on()
+~~~
+
+### 4、注入依赖
+
+> 这种方式就是Vue中的**依赖注入**，该方法用于**父子组件之间的通信**。当然这里所说的父子不一定是真正的父子，也可以是祖孙组件，在层数很深的情况下，可以使用这种方法来进行传值。就不用一层一层的传递了
+
+> **注意：** 依赖注入所提供的属性是**非响应式**的
+
+~~~javascript
+//父组件
+provide(){
+	return {
+        message:'我是注入的数据'
+    }
+}
+~~~
+
+~~~javascript
+//子组件
+inject:["message"]
+inject:{
+	message:{
+        from：message     //property 是在可用的注入内容中搜索用的 key (字符串或 Symbol)
+		default          //property 是降级情况下使用的 value (值)
+    }
+}   注意：message为接收的名字 from指定来源(有可能来自父级多代....祖)
+~~~
+
+### 5、组件实例
+
+1. 定义  ref="name"
+2. 获取ref 对象      this.$refs['name']     =>  可以使用 子组件内的方法
+3. this.$nextTick(() => {  当数据发生发生变化的时候  在Dom 还没有渲染的时候是那不到 ref 的})       
+
+### 6、父子组件
+
+- 使用`$parent`可以让组件访问父组件的实例（访问的是上一级父组件的属性和方法）
+- 使用`$children`可以让组件访问子组件的实例，但是，`$children`并不能保证顺序，**并且访问的数据也不是响应式的**。
 
 ###  :star:VueRouter
 
