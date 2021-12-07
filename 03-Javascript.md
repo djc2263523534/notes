@@ -381,6 +381,7 @@ const object1 = { foo: 'bar', baz: 42 };
 console.log(Object.entries(object1)[1]);
 // expected output: Array ["baz", 42]
 
+Object.fromEntries([["a",1]])
 ~~~
 
 ### 2.创建和拷贝

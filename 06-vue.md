@@ -80,6 +80,18 @@ module.exports = {
         }
     }
 }
+
+chainWebpack: config => {
+    config.resolve.alias
+      .set('myconfig', path.join(__dirname, './myconfig/config.js'))
+}
+pluginOptions: {            //配置less
+        'style-resources-loader': {
+            preProcessor: 'less',
+            // less所在文件路径
+            patterns: [path.resolve(__dirname, './src/assets/css/base.less')]
+        }
+    },
 ~~~
 
 ### 3、指令
@@ -192,33 +204,25 @@ watch:{
 }
 ~~~
 
-> 
 
-### 7、样式冲突
+
+### 6、样式冲突
 
 1. scope  组件作用域
 2. /deep/  样式穿透
 
-
-
-### 10、获取Dom元素
-
-1. 
-
-### 11、动态组件
+### 7、动态组件
 
 1. 使用component的 is属性(:is 动态渲染)
 2. include   缓存组件      exclude  没有缓存的组件
 
-​	
-
 ~~~vue
 <keep-link include="组件名">
-	<component :is=""></component>        	动态组件的使用
+	<component :is=""></component>        	//动态组件的使用
 </keep-link>
 ~~~
 
-### 12、插槽的使用
+### 8、插槽的使用
 
 1. 基本使用
 2. 具名插槽  name="default" (默认名称)     简写：#default
@@ -240,11 +244,11 @@ watch:{
   </fater>
 ~~~
 
-### 12、自定义指令
+### 9、自定义指令
 
 ![Snipaste_2021-10-22_19-18-46](C:\Users\坟场蹦迪\Desktop\工具箱\笔记\image\Snipaste_2021-10-22_19-18-46.png)
 
-~~~vue
+~~~markdown
 1.私有自定义指令          v-color="'red'"
 directives:{
 	color:{
@@ -280,7 +284,7 @@ Vue.directives('color',(el,bindind) => {
 })
 ~~~
 
-### 13、render函数的使用
+### 10、渲染函数
 
 1. 返回一个createElement( **标签名** ,  **Object** ,  **Array**)接收三个参数(删除template)
 
@@ -309,7 +313,7 @@ render(createElement) {
   },
 ~~~
 
-### 14、Mixins的使用
+### 11、混入
 
 1. 数据对象在内部会进行递归合并，并在发生冲突时以**组件数据优先**
 2. 同名钩子函数将合并为一个数组，因此都将被调用。另外，**混入对象的钩子将在组件自身钩子之前调用**
@@ -450,7 +454,7 @@ inject:{
 
 ### 5、组件实例
 
-1. 定义  ref="name"
+1. 定义 ` ref="name"
 2. 获取ref 对象      this.$refs['name']     =>  可以使用 子组件内的方法
 3. this.$nextTick(() => {  当数据发生发生变化的时候  在Dom 还没有渲染的时候是那不到 ref 的})       
 
@@ -461,12 +465,117 @@ inject:{
 
 ###  :star:VueRouter
 
-### 1、路由的使用
+### 1、路由懒加载
+
+~~~javascript
+1.方案一(常用)：使用箭头函数+import动态加载
+const Home = () => import('view/Home,vue');
+
+2.方案二：使用箭头函数+require动态加载
+const Home = resolve => (require(['view/Home.vue']),resolve) 
+
+3.方案三：使用webpack的require.ensure技术，也可以实现按需加载。 这种情况下，多个路由指定相同的chunkName，会合并打包成一个js文件
+const List = r => require.ensure([], () => r(require('@/components/list')), 'list');
+~~~
+
+### 2、路由模式
+
+> Vue-Router有两种模式：**hash模式**和**history模式**。默认的路由模式是**hash模式**。
+
+> **特点**：hash值会出现在URL里面，但是不会出现在HTTP请求中，对后端完全没有影响。所以改变hash值，不会重新加载页面。这种模式的浏览器支持度很好，低版本的IE浏览器也支持这种模式。hash路由被称为是前端路由，已经成为SPA（单页面应用）的标配。
+
+~~~javascript
+原理： hash模式的主要原理就是onhashchange()事件：
+
+window.onhashchange = function(event){
+	console.log(event.oldURL, event.newURL);
+	let hash = location.hash.slice(1);
+}
+~~~
+
+> 使用onhashchange()事件的好处就是，在页面的hash值发生变化时，无需向后端发起请求，window就可以监听事件的改变，并按规则加载相应的代码。除此之外，hash值变化对应的URL都会被浏览器记录下来，这样浏览器就能实现页面的前进和后退。虽然是没有请求后端服务器，但是页面的hash值和对应的URL关联起来了
+
+> history模式的URL中没有#，它使用的是传统的路由分发模式，即用户在输入一个URL时，服务器会接收这个请求，并解析这个URL，然后做出相应的逻辑处理。 **特点：** 当使用history模式时，URL就像这样：[abc.com/user/id](https://link.juejin.cn?target=http%3A%2F%2Fabc.com%2Fuser%2Fid)。相比hash模式更加好看。但是，history模式需要后台配置支持。如果后台没有正确配置，访问时会返回404。 **API：** history api可以分为两大部分，切换历史状态和修改历史状态：
+
+1. **修改历史状态**   pushState()  replaceState()
+2. **切换历史状态**    forward() back()  go()
+
+### 3、路由跳转
+
+**（1）param方式**
+
+- 配置路由格式：`/router/:id`
+- 传递的方式：在path后面跟上对应的值
+- 传递后形成的路径：`/router/123`
+- 参数获取 通过 `$route.params.userid` 获取传递的值
+
+~~~ javascript
+<router-link :to="'/user/'+userId" replace>用户</router-link> 
+
+// 方法1：
+<router-link :to="{ name: 'users', params: { uname: wade }}">按钮</router-link
+
+// 方法2：
+this.$router.push({name:'users',params:{uname:wade}})
+
+// 方法3：
+this.$router.push('/user/' + wade)
+
+~~~
+
+**（2）query方式**
+
+- 配置路由格式：`/router`，也就是普通配置
+- 传递的方式：对象中使用query的key作为传递方式
+- 传递后形成的路径：`/route?id=123`
+- 通过$route.query 获取传递的值
+
+~~~javascript
+this.$router.push({
+    path: "/profile",
+    query: {
+        name: "kobi",
+        age: "28",
+        height: 198
+    }
+  });
+
+// 方法1：
+<router-link :to="{ name: 'users', query: { uname: james }}">按钮</router-link>
+
+// 方法2：
+this.$router.push({ name: 'users', query:{ uname:james }})
+
+// 方法3：
+<router-link :to="{ path: '/user', query: { uname:james }}">按钮</router-link>
+
+// 方法4：
+this.$router.push({ path: '/user', query:{ uname:james }})
+
+// 方法5：
+this.$router.push('/user?uname=' + jsmes)
+
+replace     导航后不会留下 history 记录          active-class  设置链接激活时使用的 CSS 类名(可配置)
+append       当前 (相对) 路径前添加基路径		  exact    链接使用“精确匹配模式
+tag			渲染成某种标签
+~~~
+
+
+
+
+
+
+
+
+
+
+
+### 4、路由的使用
 
 1. $router  跳转和传参
 2. $route    获取参数
 
-~~~vue
+~~~javascript
 inport Vue from 'vue'
 inport VueRouter from 'vue-router'
 
@@ -487,14 +596,11 @@ const routes = {
   pathToRegexpOptions?: Object // 编译正则的选项
 }
 
-
-
 const router = new VueRouter({
-	 mode: 'history',     //hash
+	 mode: 'history',     
   	 base: process.env.BASE_URL,
   	 routes,
      linkActiveClass: '类名'  //设置激活的class
-
 })
 
 router.beforeEach((to, form, next) => {
@@ -508,36 +614,16 @@ router.beforeEach((to, form, next) => {
 
 })
       
-      
-~~~
-
-###  2、路由的跳转
-
-~~~vue
-<!-- 字符串 -->
-<router-link to="home">Home</router-link>
-<!-- 渲染结果 -->
-<a href="home">Home</a>
-
-<!-- 使用 v-bind 的 JS 表达式 -->
-<router-link v-bind:to="'home'">Home</router-link>
-
-<!-- 不写 v-bind 也可以，就像绑定别的属性一样 -->
-<router-link :to="'home'">Home</router-link>
-
-<!-- 同上 -->
-<router-link :to="{ path: 'home' }">Home</router-link>
-
-<!-- 命名的路由 -->
-<router-link :to="{ name: 'user', params: { userId: 123 }}">User</router-link>
-
-<!-- 带查询参数，下面的结果为 /register?plan=private -->
-<router-link :to="{ path: 'register', query: { plan: 'private' }}">Register</router-link>
-
-
-replace     导航后不会留下 history 记录          active-class  设置链接激活时使用的 CSS 类名(可配置)
-append       当前 (相对) 路径前添加基路径		  exact    链接使用“精确匹配模式
-tag			渲染成某种标签
+// 监听,当路由发生变化的时候执行
+watch: {
+  $route: {
+    handler: function(val, oldVal){
+      console.log(val);
+    },
+    // 深度观察监听
+    deep: true
+  }
+},
 ~~~
 
 ###  :star:axios
@@ -742,4 +828,10 @@ export.default {
 ...mapState({
       name: (state) => state.user.name,
 }),
+~~~
+
+~~~javascript
+
+
+
 ~~~
