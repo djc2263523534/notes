@@ -2,7 +2,7 @@
 
 1. [配置参照](https://segmentfault.com/a/1190000022809326/)
 2. 手动在项目根目录（或其他）创建 tsconfig.json 文件并填写配置；
-3. 通过 `tsc --init` 初始化 tsconfig.json 文件。
+3. 通过 `tsc --init` 初始化 tsconfig.json 文件。  tsc -w
 
 #### 1.compileOnSave
 
@@ -290,9 +290,10 @@ function printLabel(info:{label:string}) //参数必须是一个对象 并且数
 
 //使用interface 定义接口
 interface fullName{
-    fristName:string;
-    secondName:string;
-    age?:number
+    fristName:string,
+    secondName:string,
+    age?:number,
+    sing?:()=> string
 }
 function test(params:fullName){}
 
@@ -355,48 +356,92 @@ class Dog implements Animal {
 
 ### 6、泛型
 
+- ~~~typescript
+  function test<T>(a:T):T{
+      return a
+  }
+  test<number>(99)
+  
+  //泛型类
+  class Min<T>{
+  	list:T[] = []
+      add(value:T):void{
+  		this.list.push(value)
+      }
+      min():T{
+  		let min = this.list[0];
+          for(var i =0;i< this.list.length; i++){
+  			if(min > this.list[i]){
+  				min = this.list[i]
+              }
+          }
+          return min
+      }
+  }
+  let m  = new Min<string>();
+  m.add('a');
+  m.add('h');
+  m.min() //a
+  
+  //函数泛型接口
+  interface ConfigFn {
+      <T>(value: T): T
+  }
+  const test1: ConfigFn = function <T>(value: T): T {
+      return value
+  }
+  //第二种方法
+  interface ConfigFn1<T> {
+      (value: T): T
+  }
+  function test2<T>(value: T): T {
+      return value
+  }
+  let myMethod: ConfigFn1<string> = test2
+  test2('字符串')
+  ~~~
+
+
+### 7、命名空间
+
 ~~~typescript
-function test<T>(a:T):T{
-    return a
+//index.ts
+namespace Scholll {
+  export interface propsType{
+    name:string,
+    age?:88
+  }
 }
-test<number>(99)
+  
+export interface propsType2{
+  name:string,
+  sing:()=>string
+}
+~~~
 
-//泛型类
-class Min<T>{
-	list:T[] = []
-    add(value:T):void{
-		this.list.push(value)
-    }
-    min():T{
-		let min = this.list[0];
-        for(var i =0;i< this.list.length; i++){
-			if(min > this.list[i]){
-				min = this.list[i]
-            }
+~~~typescript
+//test.ts
+/// <reference path="index.ts">
+let mainO:Scholl = {
+  name:'第一种方法',
+  age:88
+}
+
+//import 导入
+import {propsType2} from index.ts
+let o:propsType2
+
+//namespace frist {
+    export class Person {
+        name: string
+        age: number
+        constructor(name: string, age: number) {
+            this.name = name
+            this.age = age
         }
-        return min
     }
 }
-let m  = new Min<string>();
-m.add('a');
-m.add('h');
-m.min() //a
-
-//函数泛型接口
-interface ConfigFn {
-    <T>(value: T): T
-}
-const test1: ConfigFn = function <T>(value: T): T {
-    return value
-}
-//第二种方法
-interface ConfigFn1<T> {
-    (value: T): T
-}
-function test2<T>(value: T): T {
-    return value
-}
-let myMethod: ConfigFn1<string> = test2
-test2('字符串')
+// let p1 = new frist.Person('xiaoming', 99)
+// console.log(p1);
 ~~~
 

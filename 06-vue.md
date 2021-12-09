@@ -240,7 +240,7 @@ watch:{
 
 3.作用域插槽的使用
   <fater>
-  	<template #child2="scope"></template>  可以通过结构赋值来获取数据
+  	<template #child2=	"scope"></template>  可以通过结构赋值来获取数据
   </fater>
 ~~~
 
@@ -585,7 +585,7 @@ const routes = {
   name?: string, // 命名路由
   components?: { [name: string]: Component }, // 命名视图组件
   redirect?: string | Location | Function,     //重定向
-  props?: boolean | Object | Function,        //路由传参
+  props?: boolean | Object | Function,        //路由传参 ($route) => {uid:$route.params.uid}
   alias?: string | Array<string>,       //url 保持别名
   children?: Array<RouteConfig>, 				// 嵌套路由
   beforeEnter?: (to: Route, from: Route, next: Function) => void,
@@ -835,3 +835,7 @@ export.default {
 
 
 ~~~
+
+~~~ javascript
+~~~
+

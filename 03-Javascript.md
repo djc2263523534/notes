@@ -315,7 +315,7 @@ const newstr = str.concat('def')  //'abcdef'
 
 ### 4、判断
 
-1. includes()				用于检C:\Users\坟场蹦迪\Desktop\blogs\backend\mock\study.js C:\Users\坟场蹦迪\Desktop\blogs\backend\app.js查字符串是否包含指定的字符串或字符
+1. includes()				用于检查字符串是否包含指定的字符串或字符
 2. endsWith()				字符串是否以指定的字符串或字符结束
 3. stratsWith()
 
